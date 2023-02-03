@@ -13,7 +13,7 @@ const typeDefs = `
  }
  type Mutation {
     postMessage(user: String!, content: String!): ID!
-    // updateUser(id: ID!, user: String!): Message!
+    updateUser(id: ID!, user: String!): Message!
  }
 `;
 const resolvers = {
