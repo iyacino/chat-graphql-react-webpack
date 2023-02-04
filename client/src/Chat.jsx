@@ -1,9 +1,10 @@
 import React, { useState } from "react"
+
 import { ApolloClient, InMemoryCache, ApolloProvider, gql, useMutation, useSubscription } from '@apollo/client';
 import { WebSocketLink } from "@apollo/client/link/ws";
 
 const link = new WebSocketLink({
-    uri: `ws://localhost:4000/`,
+    uri: `ws://localhost:4000`,
     options: {
       reconnect: true,
     },
@@ -15,7 +16,7 @@ const link = new WebSocketLink({
   });
 
 const GET_MESSAGES = gql`
-  query {
+  subscription {
     messages {
         id
         user
