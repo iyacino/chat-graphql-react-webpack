@@ -1,4 +1,4 @@
-const { GraphQLServer } = require('graphql-yoga');
+const { GraphQLServer, PubSub } = require('graphql-yoga');
 
 const messages = [];
 
@@ -15,7 +15,13 @@ const typeDefs = `
     postMessage(user: String!, content: String!): ID!
     updateUser(id: ID!, user: String!): Message!
  }
+ type Subscription  {
+    messages: [Message!]
+ }
 `;
+
+const subscribers = [];
+const onMessagesUpdates = (fn) => subscribers.push(fn);
 const resolvers = {
     Query: {
         messages: () => messages,
@@ -30,8 +36,9 @@ const resolvers = {
                     content
                 }
             );
+            subscribers.forEach((fn) => fn());
             return id;
-        },
+    },
         // updateUser: (parent, { id, user } ) => {
         //     const messageIndex = messages.findIndex(message => message.id.toString() === id);
         //     let updatedMessage = {};
@@ -46,11 +53,22 @@ const resolvers = {
         //     messages.splice(messageIndex, 1, updatedMessage);
         //     return updatedMessage;
         // },
+    
     },
+    Subscription: {
+        messages: {
+            subscribe: (parent, args, { pubsub }) =>{
+                const channel = Math.random().toString(36).slice(2,15);
+                onMessagesUpdates( () => pubsub.publish(channel, { messages }));
+                setTimeout(() => pubsub.publish(channel, { messages }), 0);
+                return pubsub.asyncIterator(channel);
+            }
+        }
+    }
 }
 
-
-const server = new GraphQLServer( {typeDefs, resolvers} )
+const pubsub = new PubSub();
+const server = new GraphQLServer( {typeDefs, resolvers, context: {pubsub}} )
 server.start(({ port }) =>{
     console.log(`Server start on http://localhost:${port}`)
 })
