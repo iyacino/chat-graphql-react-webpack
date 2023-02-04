@@ -1,7 +1,15 @@
 import React, { useState } from "react"
-import { ApolloClient, InMemoryCache, ApolloProvider, gql, useQuery, useMutation } from '@apollo/client';
+import { ApolloClient, InMemoryCache, ApolloProvider, gql, useMutation, useSubscription } from '@apollo/client';
+import { WebSocketLink } from "@apollo/client/link/ws";
 
+const link = new WebSocketLink({
+    uri: `ws://localhost:4000/`,
+    options: {
+      reconnect: true,
+    },
+  });
  const client = new ApolloClient({
+    link,
     uri: 'http://localhost:4000',
     cache: new InMemoryCache(),
   });
@@ -23,7 +31,7 @@ const POST_MESSAGE = gql`
 `;
 
 const Messages = ({ user }) =>{
-    const { data } = useQuery(GET_MESSAGES, { pollInterval: 500});
+    const { data } = useSubscription(GET_MESSAGES);
     if(!data){
         return null;
     }
