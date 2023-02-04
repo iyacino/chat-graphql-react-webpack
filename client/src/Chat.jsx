@@ -33,12 +33,18 @@ const POST_MESSAGE = gql`
 
 const Messages = ({ user }) =>{
     const { data } = useSubscription(GET_MESSAGES);
+    window.scrollTo(0, document.body.scrollHeight);
     if(!data){
         return null;
     }
     return(
-        <>
+        <div style={{
+            
+            margin: "1em",
+            padding: "2em",
+        }}>
         {
+       
         data.messages.map( ({ id, user: messageUser, content }) => 
              <div 
                 style={{
@@ -67,6 +73,7 @@ const Messages = ({ user }) =>{
                 }
                 <div
                     style={{
+                        overflowAnchor: "auto",
                         background: user === messageUser ? "#58bf56" : "#e5e6ea",
                         color: user === messageUser ? "white" : "black",
                         padding: "1em",
@@ -78,7 +85,7 @@ const Messages = ({ user }) =>{
                 </div>
              </div>
         )}
-        </>
+        </div>
     )
 }
 
@@ -101,10 +108,21 @@ const Chat = () => {
     return (
         <div style={{
             marginLeft: "400px",
-            marginRight: "400px"
+            marginRight: "400px",
+            overflowAnchor: "none",
+
         }}>
+            <h2 style={{
+                textAlign: "center"
+            }}>
+                Realtime Chat using React and GraphQL
+            </h2>
             <Messages user={message.user}/>
             <div style={{
+                zIndex: "100",
+                width: "47%",
+                position:"fixed",
+                bottom: "0",
                 display: 'flex',
                 justifyContent: "center",
                 alignItems: "center",
